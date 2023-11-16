@@ -1,5 +1,5 @@
 import firebase from '../db'
-import Post, { IPost, PostVoteType } from '@models/post'
+import Post, { IPost, PostVoteType, CreatePostRequest, GetPostResponse } from '@models/post'
 import { Request, Response } from 'express'
 const firestore = firebase.firestore()
 
@@ -7,14 +7,10 @@ const PostController = {
   // 글 작성
   async createPost(req: Request, res: Response): Promise<void> {
     try {
-      const data: IPost = req.body;
-      // const initialVoteData: PostVoteType = {
-      //   left: {
-      //     title: data.voteData.title,
-      //     count: 0
-      //   }
-      // }
-      const newPost = new Post(data.content, data.voteData, data.uid);
+      const { content, voteTitles, uid } = req.body as CreatePostRequest;
+      const voteData = { left: { ...voteTitles.left, count: 0 }, right: { ...voteTitles.right, count: 0 } };
+
+      const newPost = new Post(content, voteData, uid);
 
       await firestore.collection('posts').doc().set(Object.assign({}, newPost));
       res.send('새 글이 작성되었습니다.');
