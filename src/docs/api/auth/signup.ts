@@ -1,4 +1,4 @@
-module.exports = {
+export const signup = {
   '/auth/sing-up': {
     post: {
       tags: ['User'],

@@ -1,5 +1,5 @@
-const dotenv = require('dotenv');
-const assert = require('assert');
+import dotenv from 'dotenv';
+import assert from 'assert';
 
 dotenv.config();
 
@@ -19,7 +19,7 @@ const {
 assert(PORT, 'PORT is required');
 assert(HOST, 'HOST is required');
 
-module.exports = {
+export const config = {
   port: PORT,
   host: HOST,
   url: HOST_URL,

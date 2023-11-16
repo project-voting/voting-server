@@ -1,3 +1,5 @@
+type API = any; // API 타입에 대한 구체적인 정의가 필요합니다.
+
 const swaggerOpenApiVersion = '3.0.0';
 
 const swaggerInfo = {
@@ -76,34 +78,28 @@ const swaggerComponents = {
 };
 
 class Swagger {
-  static #uniqueSwaggerInstance;
-  #paths = [{}];
-  #option = {};
-  #setUpOption = {};
+  private static uniqueSwaggerInstance: Swagger;
+  private paths: API[] = [];
+  private option: any = {}; // option 타입에 대한 구체적인 정의가 필요합니다.
+  private setUpOption: any = {}; // setUpOption 타입에 대한 구체적인 정의가 필요합니다.
 
-  /**
-   *
-   * @returns {Swagger}
-   */
   constructor() {
-    if (!Swagger.#uniqueSwaggerInstance) {
-      this.#init();
-      Swagger.#uniqueSwaggerInstance = this;
+    if (!Swagger.uniqueSwaggerInstance) {
+      this.init();
+      Swagger.uniqueSwaggerInstance = this;
     }
 
-    return Swagger.#uniqueSwaggerInstance;
+    return Swagger.uniqueSwaggerInstance;
   }
 
-  #init() {
-    this.#option = {
+  private init() {
+    this.option = {
       definition: {
         openapi: swaggerOpenApiVersion,
         info: swaggerInfo,
         servers: swaggerServers,
         schemes: swaggerSchemes,
         securityDefinitions: swaggerSecurityDefinitions,
-
-        /* open api 3.0.0 version option */
         produces: swaggerProduces,
         components: {
           securitySchemes: swaggerSecurityScheme,
@@ -113,21 +109,20 @@ class Swagger {
       },
       apis: [],
     };
-    this.#setUpOption = {
-      // search
+    this.setUpOption = {
       explorer: true,
     };
   }
 
-  addAPI(api) {
-    this.#paths.push(api);
+  public addAPI(api: API) {
+    this.paths.push(api);
   }
 
-  #processAPI() {
-    const path = {};
+  private processAPI() {
+    const path: any = {}; // path 타입에 대한 구체적인 정의가 필요합니다.
 
-    for (let i = 0; i < this.#paths.length; i += 1) {
-      for (const [key, value] of Object.entries(this.#paths[i])) {
+    for (let i = 0; i < this.paths.length; i += 1) {
+      for (const [key, value] of Object.entries(this.paths[i])) {
         path[key] = value;
       }
     }
@@ -135,15 +130,15 @@ class Swagger {
     return path;
   }
 
-  getOption() {
-    const path = this.#processAPI();
-    this.#option.definition.paths = path;
+  public getOption() {
+    const path = this.processAPI();
+    this.option.definition.paths = path;
 
     return {
-      apiOption: this.#option,
-      setUpOption: this.#setUpOption,
+      apiOption: this.option,
+      setUpOption: this.setUpOption,
     };
   }
 }
 
-module.exports = Swagger;
+export default Swagger;
