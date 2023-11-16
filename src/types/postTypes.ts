@@ -1,11 +1,7 @@
 // 글 생성 - 투표 항목
 export type CreatePostVoteType = {
-  left: {
-    title: string;
-  },
-  right: {
-    title: string;
-  }
+  leftTitle: string;
+  rightTitle: string;
 }
 
 // 글 생성 타입

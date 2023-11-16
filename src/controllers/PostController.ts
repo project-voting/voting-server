@@ -1,6 +1,6 @@
 import firebase from '../db'
 import Post from '@models/post'
-import { CreatePostRequest, GetPostResponse, IPost } from '&types/postTypes'
+import { CreatePostRequest, GetPostResponse } from '&types/postTypes'
 import { Request, Response } from 'express'
 const firestore = firebase.firestore()
 
@@ -10,9 +10,7 @@ const PostController = {
     try {
       const { content, voteTitles, uid } = req.body as CreatePostRequest;
 
-      // 투표수 0 기본값 설정
-      const voteData = { left: { ...voteTitles.left, count: 0 }, right: { ...voteTitles.right, count: 0 } };
-      const newPost = new Post(content, voteData, uid);
+      const newPost = Post.createNewPost(content, voteTitles, uid);
 
       await firestore.collection('posts').doc().set(Object.assign({}, newPost));
       res.send('새 글이 작성되었습니다.');
@@ -49,12 +47,17 @@ const PostController = {
     if (postId && typeof postId === 'string') {
       try {
         const postSnapshot = await firestore.collection('posts').doc(postId).get();
-        const postData = postSnapshot.data() as GetPostResponse;
+        if (!postSnapshot.exists) {
+          res.status(404).send('Post not found');
+          return;
+        }
 
-        res.send(postData);
+        const postData = postSnapshot.data() as GetPostResponse;
+        const post = Post.getPostFromDB(postData.content, postData.voteData, postData.uid);
+        res.send(post);
       }
       catch (error: any) {
-        res.status(400).send(error.message)
+        res.status(400).send(error.message);
       }
     }
     // 전체 글 조회
@@ -63,9 +66,10 @@ const PostController = {
         const postSnapshot = await firestore.collection('posts').get();
         const postsArray: Post[] = [];
 
+        // 가져온 데이터를 배열 형태로 가공
         postSnapshot.forEach((doc) => {
           const postData = doc.data() as GetPostResponse;
-          const post_data = new Post(postData.content, postData.voteData, postData.uid);
+          const post_data = Post.getPostFromDB(postData.content, postData.voteData, postData.uid);
           postsArray.push(post_data);
         });
 
