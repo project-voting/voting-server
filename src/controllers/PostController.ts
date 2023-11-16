@@ -1,15 +1,17 @@
 import firebase from '../db'
-import Post, { IPost, PostVoteType, CreatePostRequest, GetPostResponse } from '@models/post'
+import Post from '@models/post'
+import { CreatePostRequest, GetPostResponse, IPost } from '&types/postTypes'
 import { Request, Response } from 'express'
 const firestore = firebase.firestore()
 
 const PostController = {
-  // 글 작성
+  // 글 생성
   async createPost(req: Request, res: Response): Promise<void> {
     try {
       const { content, voteTitles, uid } = req.body as CreatePostRequest;
-      const voteData = { left: { ...voteTitles.left, count: 0 }, right: { ...voteTitles.right, count: 0 } };
 
+      // 투표수 0 기본값 설정
+      const voteData = { left: { ...voteTitles.left, count: 0 }, right: { ...voteTitles.right, count: 0 } };
       const newPost = new Post(content, voteData, uid);
 
       await firestore.collection('posts').doc().set(Object.assign({}, newPost));
@@ -47,7 +49,7 @@ const PostController = {
     if (postId && typeof postId === 'string') {
       try {
         const postSnapshot = await firestore.collection('posts').doc(postId).get();
-        const postData = postSnapshot.data() as IPost;
+        const postData = postSnapshot.data() as GetPostResponse;
 
         res.send(postData);
       }
@@ -62,7 +64,7 @@ const PostController = {
         const postsArray: Post[] = [];
 
         postSnapshot.forEach((doc) => {
-          const postData = doc.data() as IPost;
+          const postData = doc.data() as GetPostResponse;
           const post_data = new Post(postData.content, postData.voteData, postData.uid);
           postsArray.push(post_data);
         });
