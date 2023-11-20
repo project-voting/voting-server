@@ -1,26 +1,28 @@
 import firebase from '../db'
 import Post from '@models/post'
+import { Request, Response, NextFunction } from 'express'
+
 import { CreatePostRequest, GetPostResponse } from '&types/postTypes'
-import { Request, Response } from 'express'
+import { sendSuccessResponse, sendErrorResponse } from '@handler/responseHandler'
 const firestore = firebase.firestore()
 
 const PostController = {
   // 글 생성
-  async createPost(req: Request, res: Response): Promise<void> {
+  async createPost(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { content, voteTitles, uid } = req.body as CreatePostRequest;
 
       const newPost = Post.createNewPost(content, voteTitles, uid);
 
       await firestore.collection('posts').doc().set(Object.assign({}, newPost));
-      res.send('새 글이 작성되었습니다.');
+      sendSuccessResponse(res, { message: "글이 작성되었습니다." });
     } catch (error: any) {
-      res.status(400).send(error.message);
+      next(error)
     }
   },
 
   // 글 삭제
-  async deletePost(req: Request, res: Response): Promise<void> {
+  async deletePost(req: Request, res: Response, next: NextFunction): Promise<void> {
     const { postId } = req.params;
     try {
       const postSnapshot = await firestore.collection('posts').doc(postId);
@@ -30,34 +32,31 @@ const PostController = {
         res.status(404).send('아이디가 유효하지 않습니다.');
       }
       else {
-        res.send('글이 삭제되었습니다.');
+        sendSuccessResponse(res, { message: "글이 삭제되었습니다." })
         postSnapshot.delete()
       }
     }
     catch (error: any) {
-      res.status(400).send(error.message)
+      next(error)
     }
   },
 
   // 글 조회
-  async getPost(req: Request, res: Response): Promise<void> {
+  async getPost(req: Request, res: Response, next: NextFunction): Promise<void> {
     const postId = req.query.postId;
 
     // 특정 글 조회
     if (postId && typeof postId === 'string') {
       try {
         const postSnapshot = await firestore.collection('posts').doc(postId).get();
-        if (!postSnapshot.exists) {
-          res.status(404).send('Post not found');
-          return;
-        }
 
         const postData = postSnapshot.data() as GetPostResponse;
         const post = Post.getPostFromDB(postData.content, postData.voteData, postData.uid);
-        res.send(post);
+
+        sendSuccessResponse(res, { data: post, message: "글 조회를 성공했습니다." })
       }
       catch (error: any) {
-        res.status(400).send(error.message);
+        next(error)
       }
     }
     // 전체 글 조회
@@ -73,9 +72,9 @@ const PostController = {
           postsArray.push(post_data);
         });
 
-        res.send(postsArray);
+        sendSuccessResponse(res, { data: postsArray, message: "글 조회를 성공했습니다." })
       } catch (error: any) {
-        res.status(400).send(error.message);
+        next(error)
       }
     }
   }

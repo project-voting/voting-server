@@ -1,6 +1,8 @@
 import express from 'express'
 import cors from 'cors'
 import bodyParser from 'body-parser'
+import { errorHandler } from '@handler/errorHandler'
+
 // routes
 import postRouter from '@routes/post-routes'
 import indexRouter from '@routes/index'
@@ -20,6 +22,9 @@ function init() {
 
   // routers
   app.use('/post', postRouter);
+
+  // 에러 핸들링 미들웨어는 라우트 정의 뒤에 위치해야함
+  app.use(errorHandler)
 
   app.listen(config.port, () => console.log('server start port 8080'))
 }

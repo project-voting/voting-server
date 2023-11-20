@@ -13,6 +13,10 @@ const swaggerTags = [
     name: 'User',
     description: '사용자 API',
   },
+  {
+    name: "Post",
+    description: '투표 글 API'
+  }
 ];
 
 const swaggerSchemes = ['http', 'https'];
@@ -29,7 +33,7 @@ const swaggerProduces = ['application/json'];
 
 const swaggerServers = [
   {
-    url: 'http://localhost:3000',
+    url: 'http://localhost:8080',
     description: '로컬 서버',
   },
 ];

@@ -1,5 +1,5 @@
-import * as signUp from './signup';
+import { signup } from './signup';
 
 export default {
-  ...signUp,
+  ...signup,
 };
