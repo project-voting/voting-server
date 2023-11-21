@@ -31,4 +31,5 @@ export interface IPost {
   content: string;
   voteData: DefaultPostVoteType;
   uid: string;
+  votedUsers: string[];
 }

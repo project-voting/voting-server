@@ -5,11 +5,13 @@ class Post implements IPost {
   content: string;
   voteData: DefaultPostVoteType;
   uid: string;
+  votedUsers: string[];
 
   constructor(content: string, voteData: DefaultPostVoteType, uid: string) {
     this.content = content;
     this.voteData = voteData;
     this.uid = uid;
+    this.votedUsers = [];
   }
 
   // 글 생성 메소드

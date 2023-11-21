@@ -3,7 +3,7 @@ import { CustomError } from './CustomError';
 
 export function errorHandler(err: Error, req: Request, res: Response, next: NextFunction) {
   if (err instanceof CustomError) {
-    return res.status(err.statusCode).json({ message: err.message });
+    return res.status(err.statusCode).json({ message: err.message, status: err.statusCode });
   }
 
   console.error(err); // 서버 로그에 에러 출력

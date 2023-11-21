@@ -18,6 +18,11 @@ export class NotFoundError extends CustomError {
   constructor(message: string = 'Not found') {
     super(message, 404);
   }
+}
 
-  // 여기에 추가적인 에러 클래스를 정의할 수 있습니다.
+/** 투표 관련 에러 */
+export class AlreadyVotedError extends CustomError {
+  constructor(message: string = "이미 투표했습니다.") {
+    super(message, 400)
+  }
 }

@@ -5,6 +5,7 @@ import { errorHandler } from '@handler/errorHandler'
 
 // routes
 import postRouter from '@routes/post-routes'
+import voteRouter from '@routes/vote-routes'
 import indexRouter from '@routes/index'
 
 import { config } from './config'
@@ -22,6 +23,7 @@ function init() {
 
   // routers
   app.use('/post', postRouter);
+  app.use('/vote', voteRouter);
 
   // 에러 핸들링 미들웨어는 라우트 정의 뒤에 위치해야함
   app.use(errorHandler)
