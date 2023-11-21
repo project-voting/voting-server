@@ -3,7 +3,8 @@ import Post from '@models/post'
 import { Request, Response, NextFunction } from 'express'
 
 import { CreatePostRequest, GetPostResponse } from '&types/postTypes'
-import { sendSuccessResponse, sendErrorResponse } from '@handler/responseHandler'
+import { sendSuccessResponse } from '@handler/responseHandler'
+import { NotFoundError } from '@handler/CustomError'
 const firestore = firebase.firestore()
 
 const PostController = {
@@ -29,11 +30,11 @@ const PostController = {
       const postData = await postSnapshot.get();
 
       if (!postData.exists) {
-        res.status(404).send('아이디가 유효하지 않습니다.');
+        throw new NotFoundError('유효하지 않은 아이디입니다.')
       }
       else {
-        sendSuccessResponse(res, { message: "글이 삭제되었습니다." })
         postSnapshot.delete()
+        sendSuccessResponse(res, { message: "글이 삭제되었습니다." })
       }
     }
     catch (error: any) {
@@ -41,7 +42,7 @@ const PostController = {
     }
   },
 
-  // 글 조회
+  // 글 조회 
   async getPost(req: Request, res: Response, next: NextFunction): Promise<void> {
     const postId = req.query.postId;
 
@@ -69,6 +70,7 @@ const PostController = {
         postSnapshot.forEach((doc) => {
           const postData = doc.data() as GetPostResponse;
           const post_data = Post.getPostFromDB(postData.content, postData.voteData, postData.uid);
+
           // 문서의 id를 추가
           const postDataWithId = {
             ...post_data,
@@ -81,6 +83,33 @@ const PostController = {
       } catch (error: any) {
         next(error)
       }
+    }
+  },
+
+  // 글 조회 - 유저
+  async getPostOfUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const { uid } = req.params
+    try {
+      console.log("test")
+      const postsRef = firestore.collection('posts');
+      const postSnapshot = await postsRef.get();
+
+      const userPosts: Post[] = []
+
+      postSnapshot.forEach((doc) => {
+        const postData = doc.data();
+        const post_data = Post.getPostFromDB(postData.content, postData.voteData, postData.uid);
+        if (postData.uid === uid) {
+          userPosts.push({
+            ...post_data,
+            postId: doc.id,
+          })
+        }
+      })
+      res.send(userPosts)
+    }
+    catch (error) {
+      next(error)
     }
   }
 }

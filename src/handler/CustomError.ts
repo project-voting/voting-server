@@ -20,7 +20,7 @@ export class NotFoundError extends CustomError {
   }
 }
 
-/** 투표 관련 에러 */
+/** 투표 - 이미 투표한 유저 */
 export class AlreadyVotedError extends CustomError {
   constructor(message: string = "이미 투표했습니다.") {
     super(message, 400)

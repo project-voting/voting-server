@@ -11,6 +11,7 @@ const VoteController = {
   // 투표
   async voting(req: Request, res: Response, next: NextFunction) {
     const { uid, postId, voteOption } = req.body as VotingPostRequest;
+
     try {
       const postRef = firestore.collection('posts').doc(postId);
       const postSnapshot = await postRef.get();
