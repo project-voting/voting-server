@@ -3,7 +3,7 @@ import Post from '@models/post'
 import { Request, Response, NextFunction } from 'express'
 
 import { CreatePostRequest, GetPostResponse } from '&types/postTypes'
-import { sendSuccessResponse } from '@handler/responseHandler'
+import { sendSuccessResponse, sendErrorResponse } from '@handler/responseHandler'
 const firestore = firebase.firestore()
 
 const PostController = {
@@ -13,7 +13,7 @@ const PostController = {
       const { content, voteTitles, uid } = req.body as CreatePostRequest;
 
       const newPost = Post.createNewPost(content, voteTitles, uid);
-      console.log(newPost)
+
       await firestore.collection('posts').doc().set(Object.assign({}, newPost));
       sendSuccessResponse(res, { message: "글이 작성되었습니다." });
     } catch (error: any) {
@@ -69,7 +69,12 @@ const PostController = {
         postSnapshot.forEach((doc) => {
           const postData = doc.data() as GetPostResponse;
           const post_data = Post.getPostFromDB(postData.content, postData.voteData, postData.uid);
-          postsArray.push(post_data);
+          // 문서의 id를 추가
+          const postDataWithId = {
+            ...post_data,
+            postId: doc.id
+          }
+          postsArray.push(postDataWithId);
         });
 
         sendSuccessResponse(res, { data: postsArray, message: "글 조회를 성공했습니다." })

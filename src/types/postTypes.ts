@@ -30,6 +30,7 @@ export type DefaultPostVoteType = {
 export interface IPost {
   content: string;
   voteData: DefaultPostVoteType;
-  uid: string;
-  votedUsers: string[];
+  uid: string; // 유저 아이디
+  postId: string; // 글 아이디
+  votedUsers: string[]; // 투표한 유저 목록
 }
